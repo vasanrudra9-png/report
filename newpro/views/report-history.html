@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report History - Report System</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Report System</div>
+                <ul class="nav-menu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/new-report">New Report</a></li>
+                    <li><a href="/total-count">Total Count</a></li>
+                    <li><a href="/report-history" class="active">Report History</a></li>
+                    <li><a href="#" id="logoutBtn" class="logout-btn">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="card">
+                <h2>Report History</h2>
+                <div class="history-list" id="historyList">
+                    <!-- Reports will be loaded here -->
+                </div>
+                <div class="pagination" id="pagination">
+                    <!-- Pagination will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Created by Dev</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentPage = 1;
+        const reportsPerPage = 10;
+        let allReports = [];
+
+        function formatDisplayDate(dateString) {
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        function getReasonPreview(reason) {
+            return reason.length > 100 ? reason.substring(0, 100) + '...' : reason;
+        }
+
+        function displayReports() {
+            const historyList = document.getElementById('historyList');
+            const startIndex = (currentPage - 1) * reportsPerPage;
+            const endIndex = startIndex + reportsPerPage;
+            const pageReports = allReports.slice(startIndex, endIndex);
+
+            if (pageReports.length === 0) {
+                historyList.innerHTML = '<div class="history-item">No reports found</div>';
+                return;
+            }
+
+            historyList.innerHTML = pageReports.map(report => `
+                <div class="history-item" onclick="viewReport('${report.id}')">
+                    <div class="name">${report.name}</div>
+                    <div class="reason-preview">${getReasonPreview(report.reason)}</div>
+                    <div class="meta">
+                        <span>Date: ${formatDisplayDate(report.date)}</span>
+                        <span>ID: ${report.id}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(allReports.length / reportsPerPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            pagination.innerHTML = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    Previous
+                </button>
+                <span>Page ${currentPage} of ${totalPages}</span>
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Next
+                </button>
+            `;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(allReports.length / reportsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                displayReports();
+                setupPagination();
+            }
+        }
+
+        function viewReport(id) {
+            window.location.href = `/report/${id}`;
+        }
+
+        async function loadReports() {
+            const response = await fetch('/api/reports');
+            allReports = await response.json();
+            
+            displayReports();
+            setupPagination();
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const response = await fetch('/logout', {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = '/';
+            }
+        });
+
+        // Load reports when page loads
+        loadReports();
+    </script>
+</body>
+</html>

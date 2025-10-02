@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Details - Report System</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Report System</div>
+                <ul class="nav-menu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/new-report">New Report</a></li>
+                    <li><a href="/total-count">Total Count</a></li>
+                    <li><a href="/report-history">Report History</a></li>
+                    <li><a href="#" id="logoutBtn" class="logout-btn">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="card">
+                <h2>Report Details</h2>
+                <div class="report-detail" id="reportDetail">
+                    <!-- Report details will be loaded here -->
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/report-history" class="btn">Back to History</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Created by Dev</p>
+        </div>
+    </footer>
+
+    <script>
+        function formatDisplayDate(dateString) {
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        async function loadReport() {
+            const path = window.location.pathname;
+            const reportId = path.split('/').pop();
+            
+            const response = await fetch(`/api/reports/${reportId}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                const report = result.report;
+                document.getElementById('reportDetail').innerHTML = `
+                    <div class="field">
+                        <label>Report ID</label>
+                        <div class="value">${report.id}</div>
+                    </div>
+                    <div class="field">
+                        <label>Name</label>
+                        <div class="value">${report.name}</div>
+                    </div>
+                    <div class="field">
+                        <label>Date</label>
+                        <div class="value">${formatDisplayDate(report.date)}</div>
+                    </div>
+                    <div class="field">
+                        <label>Reason</label>
+                        <div class="value" style="white-space: pre-wrap;">${report.reason}</div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('reportDetail').innerHTML = '<p>Report not found</p>';
+            }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const response = await fetch('/logout', {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = '/';
+            }
+        });
+
+        // Load report when page loads
+        loadReport();
+    </script>
+</body>
+</html>

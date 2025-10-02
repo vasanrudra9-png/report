@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Count - Report System</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Report System</div>
+                <ul class="nav-menu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/new-report">New Report</a></li>
+                    <li><a href="/total-count" class="active">Total Count</a></li>
+                    <li><a href="/report-history">Report History</a></li>
+                    <li><a href="#" id="logoutBtn" class="logout-btn">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="card">
+                <h2>Total Report Count</h2>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Reports</div>
+                        <div class="stat-number" id="totalCount">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Created by Dev</p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadTotalCount() {
+            const response = await fetch('/api/reports-count');
+            const result = await response.json();
+            
+            document.getElementById('totalCount').textContent = result.count;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const response = await fetch('/logout', {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = '/';
+            }
+        });
+
+        // Load count when page loads
+        loadTotalCount();
+    </script>
+</body>
+</html>

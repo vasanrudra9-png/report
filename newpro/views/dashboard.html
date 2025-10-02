@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Report System</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Report System</div>
+                <ul class="nav-menu">
+                    <li><a href="/dashboard" class="active">Dashboard</a></li>
+                    <li><a href="/new-report">New Report</a></li>
+                    <li><a href="/total-count">Total Count</a></li>
+                    <li><a href="/report-history">Report History</a></li>
+                    <li><a href="#" id="logoutBtn" class="logout-btn">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="card">
+                <h2>Welcome to Report System</h2>
+                <p>Use the navigation menu to:</p>
+                <ul style="margin: 20px 0; padding-left: 20px;">
+                    <li>Create new reports</li>
+                    <li>View total report count</li>
+                    <li>Browse report history</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Created by Dev</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const response = await fetch('/logout', {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>
